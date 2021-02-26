@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>report</title>
+		<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+		<link href="../../index/css/bootstrap.min.css" rel="stylesheet">
+		<!-- <link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_fqwptv0pmzf.css" /> -->
+		<link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_7u63bywi9nk.css">
+		<!-- h5+ 的css -->
+		<link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+		<!-- self css -->
+		<link rel="stylesheet" href="../css/com.css">
+		<style>
+			body{text-align: left;}
+			.no_group p{font-size:0.3rem;color:#868c92;margin:0.65rem 0;}
+			.add_phone,.sm{width:80%;border-radius: 40px;height:0.8rem;font-size:0.3rem;}
+			.sm{border-color:#15b346;color:#15b346;}
+			.icon-delete{color:#4cae4c;font-size:0.5rem;}
+			.share .group_name,.share .state{font-size:0.3rem;}
+			.share .state{color:#999;}
+			.list{margin:0 20px;border-bottom:1px solid #ececec;line-height: 0.8rem;}
+			.list div[class ^= col]{padding:0;}
+			.share_foot{width:100%;position: fixed;bottom:1.5rem;left:50%;margin-left:-50%;height:2.5rem;}
+			.group_list {max-height:7.5rem;overflow-y: auto;}
+			.hdata {
+				color: #e1673e;
+				font-size: 14px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.share .group_name{margin-right:0.4rem;}
+			.tc{top:1rem;}
+			.icon-jia_wrap{margin-right:10px;position: relative;display: none;}
+			.top .icon-jia{color:#999;font-size:0.3rem;}
+			.icon-jia_tc{background-color:#fff;box-shadow: 0 0 9px 0 rgba(0,0,0,.14);font-size:0.3rem;padding:0.3rem 0.4rem;border-radius: 0.4rem;
+			position: absolute;width:2.8rem;right:0;top:20px;z-index: 10;display: none;}
+			.icon-jia_tc p{margin-bottom:0;}
+			.icon-jia_tc .p1{margin-bottom:0.6rem;}
+			.transparent{width: 100%;height:100%;position: fixed;top:0;left:0;z-index:9;background:rgba(0,0,0,.35);display: none;}
+			.top{font-size:0.5rem;}
+			.top span{top:0;}
+			.look{margin-right:10px;}
+		</style>
+	</head>
+	<body ><!-- onselectstart="return false;" -->
+		<!-- <div class="top_wrap"></div> -->
+		<div class="transparent" onclick='transparentHide()'></div>
+		<div class="share">
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="top mt80">
+							<a href="../my.html" class="add_back">
+								<!-- <i class="iconfont icon-left"></i> -->
+								<span> 群组</span>
+							</a>
+							<div class="pull-right icon-jia_wrap">
+								<i class="iconfont icon-jia"  onclick="addGroupIcon()"></i>
+								<div class="icon-jia_tc">
+									<p  class="p1" onclick="iconJiaPhone()">手机号码添加</p>
+									<p onclick="openBarcode('jia')">扫码添加</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row no_group">
+					<div class="col-xs-12">
+						<p class="text-center"> 您还没有群组成员，点击添加 </p>
+					</div>
+				</div>
+
+				<div class="row group_list mt20">
+				</div>
+
+				<div class="row share_foot">
+					<div class="col-xs-12 text-center">
+						<button class="btn btn-success add_phone wrap"> 手机号码添加 </button>
+						<div class="tc phone_tc">
+							<div class="tc_top clearfix mt80">
+								<div class="wrap phone_wrap">
+									<span class="pull-left s1"><b>手机号码添加</b></span>
+									<i class="pull-right iconfont icon-close i1 close"></i>
+								</div>
+
+							</div>
+							<div class="line"></div>
+							<div class="input_wrap position_relative">
+								<input type="text" class="form-control phone_val" id="phone_val">
+								<i class="iconfont icon-close i2 del phone_del"></i>
+							</div>
+							<div class="clearfix">
+								<button class="pull-left btn btn-default cancel">取消</button>
+								<button class="pull-right btn btn-success sure" id="group_phone_data">确认</button>
+							</div>
+						</div>
+
+					</div>
+					<div class="col-xs-12 text-center mt60" id="plist">
+						<button class="btn btn-default sm" onclick="openBarcode()"> 扫码添加</button>
+						<!-- <div class="button" onclick="openBarcode()">扫一扫</div> -->
+						<ul id="history" class="dlist" style="text-align:left;display: none;">
+							<li id="nohistory" class="ditem" onclick="onempty()">无历史记录 </li>
+						</ul>
+						<!-- <br
+						<div class="button button-waring" onclick="cleanHistroy()">清空历史记录</div> -->
+					</div>
+				</div>
+			</div>
+
+			<div class="foot">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-3 col">
+							<a href="../../index/index.html"><i class="iconfont icon-home"></i>首页</a>
+						</div>
+						<div class="col-xs-3 col">
+							<a href="../../index/device.html"><i class="iconfont icon-api"></i>设备</a>
+						</div>
+						<div class="col-xs-3 col foot_active">
+							<a href="share.html"><i class="iconfont icon-team"></i>群组</a>
+						</div>
+						<div class="col-xs-3 col ">
+							<a href="../../component/my.html" ><i class="iconfont icon-setting-fill"></i>我的</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script> -->
+<script src="../../index/js/jquery.min.js"></script>
+<script src="../js/com.js"></script>
+<script src="../js/share.js"></script>
+<!-- 扫描代码 -->
+<script type="text/javascript" src="../../js/common.js"></script>
+
+<script type="text/javascript">
+			var group_arr = [];
+			var text = '';
+			var img = null;
+			var blist = [];
+
+			function scaned(t, r, f) {
+				var d = new Date();
+				var h = d.getHours(),
+					m = d.getMinutes(),
+					s = d.getSeconds(),
+					ms = d.getMilliseconds();
+				if (h < 10) {
+					h = '0' + h;
+				}
+				if (m < 10) {
+					m = '0' + m;
+				}
+				if (s < 10) {
+					s = '0' + s;
+				}
+				if (ms < 10) {
+					ms = '00' + ms;
+				} else if (ms < 100) {
+					ms = '0' + ms;
+				}
+				var ts = '[' + h + ':' + m + ':' + s + '.' + ms + ']';
+				var li = null,
+					hl = document.getElementById('history');
+				if (blist.length > 0) {
+					li = document.createElement('li');
+					li.className = 'ditem';
+					hl.insertBefore(li, hl.childNodes[0]);
+				} else {
+					li = document.getElementById('nohistory');
+				}
+				li.id = blist.length;
+				var html = '[' + h + ':' + m + ':' + s + '.' + ms + ']' + '　　' + t + '码<div class="hdata">';
+				html += r;
+				html += '</div>';
+				li.innerHTML = html;
+				text = r ;
+				console.log('二维码扫描结果是 ==' + text);
+				var textArr = text.split(',');
+				var binding_userid = textArr[0];
+				var name = textArr[1];
+				console.log('二维码扫描结果binding_userid是 ==' + binding_userid);
+				console.log('二维码扫描结果name是 ==' + name);
+				var list = ''
+
+				// 二维码添加添加群组成员
+
+					var phone_val = name;
+					var groupPhone = window.localStorage.getItem("groupPhone");
+					if(groupPhone&&groupPhone.length>0){
+						var g = groupPhone.replace(/&/g,',');
+						var s = g.substring(0,g.length);
+						var group_arr = s.split(',');
+
+					}else{
+						group_arr = [];
+					}
+
+					   console.log(group_arr);
+						group_arr.push(phone_val);
+						var phone_str = group_arr.join('&');
+
+
+					// 添加群组 设置缓存
+					window.localStorage.setItem('groupPhone',phone_str);
+
+
+					// 传递数据到后台
+					var group_list = '';
+
+					// if(!(/^1(3|4|5|7|8)\d{9}$/.test(binding_userid))){
+					// 	alert("手机号码有误，请重填");
+					// 	return false;
+					// }
+					var userId = window.localStorage.getItem("useId");
+					$.ajax({
+						url:'https://192.168.1.55:448/user/bindingUserAdd',
+						type:'post',
+						data:{
+							'user_id':userId,
+							'binding_userid':binding_userid,
+							 'type' :'2'      //   二维码
+						},
+						dataType:'json',
+						success:function(res){
+							console.log('扫描添加群组成功的数据== userId == ' + userId + ', binding_userid == ' + binding_userid  + '==' + 2 );
+							console.log("扫描添加成功后返回的数据 == " + JSON.stringify(res));
+							if(res.code==200){
+								if(res.total==0){
+									alert("添加失败，请稍后重试！");
+								}
+								else if(res.total==1){
+									console.log('添加成功');
+									group_list += '<div class="list clearfix row"  type="2"   binding_userid = "'+ binding_userid +'"   >'
+									group_list +=	'<div class="col-xs-8">'
+									group_list +=		'<span class="group_name" id="add_name"> '+ name +' </span>'
+									// group_list +=		'<span class="state"> 已连接 </span>'
+									group_list +=	'</div>'
+									group_list +=	'<div class="col-xs-4 text-right">'
+									group_list +=       '<i class="look" onclick="groupDetail('+ binding_userid +')">查看</i>'
+									group_list +=		'<i class="iconfont  del_list" onclick="del_list(this,'+ userId +', '+ binding_userid +')">删除</i>'
+									group_list +=	'</div>'
+									group_list +='</div>';
+									$('.group_list').append(group_list).show();
+									$('.no_group').hide();
+									$('.phone_tc').hide();
+									console.log('type== ' + $('.list').attr('type'));
+								}
+								else if(res.total==2){
+									alert("已添加该用户，请勿重复添加！")
+								}
+								else if(res.total==3){
+									alert("该用户未注册本产品，请先注册！")
+								}
+							}
+
+						},
+						error:function(ero){
+							console.log(ero);
+						}
+					})
+
+
+				/* 二维码添加结束 */
+
+
+				li.setAttribute('onclick', 'selected(id)');
+				blist[blist.length] = {
+					type: t,
+					result: r,
+					file: f
+				};
+				update(t, r, f);
+
+			}
+
+			function selected(id) {
+				var h = blist[id];
+				update(h.type, h.result, h.file);
+				if (h.result.indexOf('http://') == 0 || h.result.indexOf('https://') == 0) {
+					plus.nativeUI.confirm(h.result, function(i) {
+						if (i.index == 0) {
+							plus.runtime.openURL(h.result);
+						}
+					}, '', ['打开', '取消']);
+				} else {
+					plus.nativeUI.console.log(h.result);
+				}
+			}
+
+			function update(t, r, f) {
+				console.log('扫描成功：');
+				console.log(t);
+				console.log(r);
+				console.log('\n图片地址：' + f);
+				if (!f || f == 'null') {
+					img.src = '../img/barcode.png';
+				} else {
+					plus.io.resolveLocalFileSystemURL(f, function(entry) {
+						img.src = entry.toLocalURL();
+					});
+					//img.src = 'http://localhost:13131/'+f;
+				}
+			}
+
+			function onempty() {
+				if (window.plus) {
+					plus.nativeUI.console.log('无扫描记录');
+				} else {
+					console.log('无扫描记录');
+				}
+			}
+
+			function cleanHistroy() {
+				if (blist.length > 0) {
+					var hl = document.getElementById('history');
+					hl.innerHTML = '<li id="nohistory" class="ditem" onclick="onempty();">无历史记录	</li>';
+				}
+				plus.io.resolveLocalFileSystemURL('_doc/barcode/', function(entry) {
+					entry.removeRecursively(function() {
+						// Success
+					}, function(e) {
+						//console.log( "failed"+e.message );
+					});
+				});
+			}
+			// 打开二维码扫描界面
+			function openBarcode(jia) {
+				if(jia == 'jia'){
+					$('.icon-jia_tc,.transparent').hide();
+				}
+				createWithoutTitle('../../plus/barcode_scan.html', {
+					titleNView: {
+						type: 'float',
+						// backgroundColor: 'rgba(215,75,40,0.3)',
+						backgroundColor: '#1ccc4e',
+						titleText: '扫一扫',
+						titleColor: '#FFFFFF',
+						autoBackButton: true,
+						buttons: [{
+							fontSrc: '_www/helloh5.ttf',
+							text: '\ue302',
+							fontSize: '18px',
+							onclick: 'javascript:scanPicture()'
+						}]
+					}
+				});
+			}
+			// 打开自定义扫描界面
+			function openBarcodeCustom() {
+				createWithoutTitle('../../plusbarcode_custom.html', {
+					titleNView: {
+						type: 'float',
+						// backgroundColor: 'rgba(215,75,40,0.3)',
+						backgroundColor: '#1ccc4e',
+						titleText: '扫一扫',
+						titleColor: '#FFFFFF',
+						autoBackButton: true,
+						buttons: [{
+							fontSrc: '_www/helloh5.ttf',
+							text: '\ue401',
+							fontSize: '18px',
+							onclick: 'javascript:switchFlash()'
+						}]
+					}
+				});
+			}
+
+
+			// 手机号码添加群组成员
+			/* $('.phone_tc .sure').click(function(){
+				var phone_val = $('.phone_val').val().trim();
+				var groupPhone = window.localStorage.getItem("groupPhone");
+				if(groupPhone&&groupPhone.length>0){
+					var g = groupPhone.replace(/&/g,',');
+					var s = g.substring(0,g.length);
+					var group_arr = s.split(',');
+
+
+					//
+					// 添加群组 设置缓存
+					// window.localStorage.setItem('groupPhone',s);
+				}else{
+					group_arr = [];
+					// phone_str += phone_val + '&';
+				}
+
+				   console.log(group_arr);
+					group_arr.push(phone_val);
+					var phone_str = group_arr.join('&');
+
+
+				// 添加群组 设置缓存
+				window.localStorage.setItem('groupPhone',phone_str);
+				var list = ''
+				// $('#add_name').text(text);
+				list += '<div class="list clearfix">'
+				list +=	'<div class="col-xs-10">'
+				list +=		'<span class="group_name" id="add_name"> '+ phone_val +' </span>'
+				list +=		'<span class="state"> 已连接 </span>'
+				list +=	'</div>'
+				list +=	'<div class="col-xs-2 text-right">'
+				list +=		'<i class="iconfont icon-delete del_list" onclick="del_list(this)"></i>'
+				list +=	'</div>'
+				list +='</div>';
+				$('.group_list').append(list).show();
+				$('.no_group').hide();
+				$('.phone_tc').hide();
+			}); */
+
+			// 删除群组成员
+			/* function del_list(obj){
+				$(obj).closest('.list').remove();
+				var li_name = $(obj).closest('.list').find('#add_name').text().trim();
+				var groupPhone = window.localStorage.getItem("groupPhone");
+				if(groupPhone&&groupPhone.length>0){
+					var g = groupPhone.replace(/&/g,',');
+					var s = g.substring(0,g.length);
+					group_arr = s.split(',');
+					console.log(group_arr);
+					group_arr.splice($.inArray(li_name,group_arr),1);  // 删除数组中元素值
+
+					console.log(group_arr);
+					 var s = group_arr.join('&');
+					// 添加群组 设置缓存
+					window.localStorage.setItem('groupPhone',s);
+				}
+			}; */
+			$('.phone_del').click(function(){
+				$('.phone_val').val('');
+			});
+
+
+
+		</script>
+
+
+
+
+

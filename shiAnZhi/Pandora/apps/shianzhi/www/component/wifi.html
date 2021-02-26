@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+		<link href="../index/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_fqwptv0pmzf.css" />
+		<link rel="stylesheet" href="css/com.css" />
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+		<!-- 日期选择插件 -->
+		<!-- <link rel="stylesheet" href="../mui/css/mui.min.css"> -->
+
+
+
+		<script src="../index/js/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+
+		<script src="../mui/js/mui.min.js"></script>
+		<style>
+			
+			button{display:block;margin:50px auto;}
+			select{width:100%;height:30px;line-height: 30px;margin-top:30px;}
+			
+		</style>
+	</head>
+	<body>
+
+		<button class="btn btn-success" onclick="getWifiName();"> 标准 wifi 列表获取 </button>
+		<div>
+			<select name="" id="wifiList"></select>
+		</div>
+		
+		<script>
+			
+		//获取当前wifi
+		 getWifiName = function() {
+			if (mui.os.android) {
+				 console.log('开始获取wifi列表');
+				var wifiManager, wifiInfo;
+				var Context = plus.android.importClass("android.content.Context");
+				var WifiManager = plus.android.importClass("android.net.wifi.WifiManager");
+				var WifiInfo = plus.android.importClass("android.net.wifi.WifiInfo");
+				wifiManager = plus.android.runtimeMainActivity().getSystemService(Context.WIFI_SERVICE);
+				wifiInfo = wifiManager.getConnectionInfo(); // 获取连接的wifi 名
+				wifis = wifiManager.getScanResults();
+				 var str = wifis.toString();
+				var s = str.substring(0,str.length);
+				 var arr = s.split(',');
+				 var name_arr = [];
+				for(var i=0;i<arr.length;i++){
+					// console.log(arr[i]);
+					if(arr[i].indexOf('SSID:')>0){
+						name_arr.push(arr[i]);
+					}
+				}
+		
+				 // console.log('新数组name_arr == ' + name_arr);
+		
+				var newNameArr = [];
+				for(var j = 0;j<name_arr.length;j++){
+					var a = name_arr[j];
+					var b = name_arr[j].indexOf('BSSID');
+					if( name_arr[j].indexOf('BSSID') == -1){
+						newNameArr.push(name_arr[j]);
+					}
+				}
+		
+				 // console.log('最终新数组newNameArr == ' + newNameArr);
+		
+				var option = '';
+				for(var k = 0;k < newNameArr.length;k++ ){
+					// console.log(newNameArr[k].substring(6,newNameArr[k].length));
+					option+= '<option>'+ newNameArr[k].substring(6,newNameArr[k].length) +'</option>';
+				};
+				// console.log(option);
+				// console.log(option);
+				$('#wifiList').html(option);
+			}
+		};
+		</script>
+
+	</body>
+</html>

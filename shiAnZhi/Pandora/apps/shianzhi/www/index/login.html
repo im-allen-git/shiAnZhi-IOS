@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+		<!-- <meta name="misapplication-tap-highlight" content="no"/>
+		<meta name="HandheldFriendly" content="true"/>
+		<meta name="MobileOptimized" content="320"/> -->
+		<title>登录</title>
+		<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+		<link href="../muiLogin/css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/login.css">
+		<style>
+			
+		</style>
+	</head>
+	<body>
+		<!-- <div class="top_wrap"></div> -->
+		<div class="log_main text-center">
+			<div class="log_logo">
+				<div class="log_left">
+					<img class="img-responsive center-block" src="img/index/shi_l3.png" alt="welcome">
+					<p>食安知</p>
+				</div>
+				<!-- <div class="log_center"><img src="img/index/shi_arrow1.png" alt="arrow"></div>
+				<div class="log_right">
+					<img class="log_weixin" src="img/index/shi_we4.png" alt="weixin">
+				</div> -->
+			</div>
+			
+			<!-- <div class="log_resiger">
+				<h1 class="log_phone">159****5486</h1>
+				<a class="log_phone_btn" href="javascript:void(0);">本机号码一键登录</a>
+			</div> -->
+			<div class="worth_mentioning">
+				<div class="mui-content-padded oauth-area"></div>
+				<input type="hidden" style="display: bock;color:#333;" id="uuid">
+				<a class="log_btn">微信登录</a>
+			</div>
+			<div class="log_protocol" id="logProtocol">
+				<label class="protocol_label"><em class="protocol_check"><i class="iconfont">&#xe7fc;</i></em>勾选即表示您已同意</label>
+				<span> <a href="javascript:void(0)">《用户协议》</a> 和<a href="javascript:void(0)">《隐私政策》</a></span>
+				<!-- <p class="protocol_tip" style="color: #fd2d00;font-size: 0.24rem;line-height: 0.24rem;margin-top: 0.1rem;">Please read the user registration agreement and check the agreement</p> -->
+			</div>
+
+		</div>
+		<script src="js/jquery.min.js"></script>
+		<script src="../muiLogin/js/mui.min.js"></script>
+		<script src="../muiLogin/js/mui.enterfocus.js"></script>
+		<script src="../muiLogin/js/app.js"></script>
+		<script src="../component/js/com.js"></script>
+		<script>
+            //setLocalStorage('alreadyLogin',true,"30");
+			var alreadyLogin = getLocalStorage("alreadyLogin");
+			console.log("alreadyLogin:"+alreadyLogin)
+			if(alreadyLogin){
+				window.location.href = 'index.html';
+			}
+			function setLocalStorage(key, value, expired) {
+			   var curTime = new Date().getTime();
+			   var expiredTime = curTime + Number(expired)*24*60*60*1000
+			  // console.log(curTime,expiredTime,expiredTime-curTime)
+			   localStorage.setItem(key,JSON.stringify({data:value,time:curTime,expired:expiredTime}));
+			 }
+			function getLocalStorage(key) {
+			   var data = localStorage.getItem(key);
+			   if(!data){
+				   return false;
+			   }
+			   var dataObj = JSON.parse(data);
+			   if ((dataObj.expired - new Date().getTime())>0) {
+				   return true;
+			   }else{
+				   return false;
+			   }
+			 }
+
+		</script>
+		<script>
+			(function($, doc) {
+
+				$.init({
+					statusBarBackground: '#f7f7f7'
+					 
+				});
+				$.plusReady(function() {
+					plus.navigator.setStatusBarStyle('dark');   //  设置状态栏自己颜色
+					plus.screen.lockOrientation("portrait-primary");
+					var settings = app.getSettings();
+					var state = app.getState();
+					var mainPage = plus.webview.getWebviewById("main");
+					var main_loaded_flag = false;
+					if(!mainPage){
+						mainPage = $.preload({
+							"id": 'main',
+
+							// "url": '../muiLogin/main.html'
+							/* "url": '../index/index.html' */
+
+
+						});
+
+					}else{
+						main_loaded_flag = true;
+					}
+
+					mainPage.addEventListener("loaded",function () {
+						main_loaded_flag = true;
+					});
+					var toMain = function() {
+						//使用定时器的原因：
+						//可能执行太快，main页面loaded事件尚未触发就执行自定义事件，此时必然会失败
+						var id = setInterval(function () {
+							if(main_loaded_flag){
+								clearInterval(id);
+								$.fire(mainPage, 'show', null);
+								mainPage.show("pop-in");
+							}
+						},20);
+					};
+					//检查 "登录状态/锁屏状态" 开始
+					if (settings.autoLogin && state.token && settings.gestures) {
+						$.openWindow({
+							url: '../muiLogin/unlock.html',
+							id: 'unlock',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					} else if (settings.autoLogin && state.token) {
+						toMain();
+					} else {
+						app.setState(null);
+						//第三方登录
+						var authBtns = ['weixin']; //配置业务支持的第三方登录
+						var auths = {};
+						var oauthArea = doc.querySelector('.oauth-area');
+						plus.oauth.getServices(function(services) {
+							for (var i in services) {
+								var service = services[i];
+								auths[service.id] = service;
+								if (~authBtns.indexOf(service.id)) {
+									var isInstalled = app.isInstalled(service.id);
+									var btn = document.createElement('div');
+									//如果微信未安装，则为不启用状态
+									btn.setAttribute('class', 'oauth-btn' + (!isInstalled && service.id === 'weixin' ? (' disabled') : ''));
+									btn.authId = service.id;
+									btn.style.backgroundImage = 'url("../muiLogin/images/' + service.id + '.png")'
+									oauthArea.appendChild(btn);
+								}
+							}
+							$(oauthArea).on('tap', '.oauth-btn', function() {
+								var oauthArea = document.querySelector('.protocol_check');
+								if(oauthArea.className.indexOf('protocol_active') < 0){  //没有选择同意就不继续走,显示提示
+									document.querySelector('.log_btn').className = 'log_btn log_embar_btn';
+									alert('还没有同意用户协议和隐私政策!');
+									return false;
+								}
+
+								if (this.classList.contains('disabled')) {
+									plus.nativeUI.toast('您尚未安装微信客户端');
+									return;
+								}
+								var auth = auths[this.authId];
+								var waiting = plus.nativeUI.showWaiting();
+								auth.login(function() {
+									/* plus.nativeUI.toast("登录认证成功"); */
+									auth.getUserInfo(function() {
+										var name = auth.userInfo.nickname || auth.userInfo.name;
+										mobile = auth.userInfo.openid;
+										console.log("微信登陆成功，微信名："+name)
+										console.log("微信登陆成功，微信名："+JSON.stringify(auth.userInfo))
+										//{"openid":"oRrdQt1jaymYH13WMxwf46r_m1go","nickname":"。","sex":1,"language":"zh_CN","city":"氹仔","province":"澳门","country":"中国","headimgurl":"http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83ericZTLD3R7HSia3M51Uickz2PyHsCeYfxiaJiclpL3lvK3H76pibIick7ThibSCVrAsp7qHT46IsBdWicu8vg/132","privilege":[],"unionid":"oU5Yyt1vqfPbOfJ7B4cBl_3QKRzw"}
+										$.ajax({
+											url:'https://192.168.1.55:448/user/registerOrLogin',
+											type:'post',
+											data:{
+												'nick_name':name,
+												'mobile':mobile,
+												'type':2    //1 手机登陆，2微信登陆
+											},
+											async:false,
+											dataType:'json',
+											success:function(result){
+												console.log('微信登陆成功'+JSON.stringify(result));
+												var useId = result.data;
+												window.localStorage.setItem('useId',useId);
+												setLocalStorage('alreadyLogin',true,"30");
+												console.log("微信发送成功")
+												console.log(useId);
+												window.localStorage.setItem('userName',name);
+												 /* console.log('缓存名' + window.localStorage.getItem("userName"));  */
+												// window.open('../index/index.html');
+												app.createState(name, function() {
+													toMain();
+												});
+												waiting.close();
+												window.location.href = 'index.html';
+											},
+											error:function(error){
+												console.log('发送失败')
+												var str = JSON.stringify(error);
+												console.log(str);
+											}
+										});
+
+									}, function(e) {
+										plus.nativeUI.toast("获取用户信息失败：" + e.message);
+									});
+								}, function(e) {
+									waiting.close();
+									plus.nativeUI.toast("登录认证失败：" + e.message);
+								});
+							});
+						}, function(e) {
+							// oauthArea.style.display = 'none';
+							oauthArea.style.display = 'block';
+							plus.nativeUI.toast("获取登录认证失败：" + e.message);
+						});
+					}
+					// close splash
+					setTimeout(function() {
+						//关闭 splash
+						plus.navigator.closeSplashscreen();
+					}, 600);
+
+					//
+					window.addEventListener('resize', function() {
+						oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';
+						// oauthArea.style.display = 'block';
+					}, false);
+					//
+					var backButtonPress = 0;
+					$.back = function(event) {
+						backButtonPress++;
+						if (backButtonPress > 1) {
+							plus.runtime.quit();
+						} else {
+							plus.nativeUI.toast('再按一次退出应用');
+						}
+						setTimeout(function() {
+							backButtonPress = 0;
+						}, 1000);
+						return false;
+					};
+
+
+
+				});
+			}(mui, document));
+
+			document.addEventListener('plusready', function(e){
+				getDeviceInfo();
+				// 获取设备信息
+				function getDeviceInfo(){
+					plus.device.getInfo({
+						success:function(e){
+							console.log('getDeviceInfo success: '+e); // 返回的是obj
+							console.log('getDeviceInfo success: '+JSON.stringify(e));
+							var uuid = e.uuid;
+							console.log(uuid);
+							$('#uuid').val(uuid);
+						},
+						fail:function(e){
+							console.log('getDeviceInfo failed: '+JSON.stringify(e));
+							console.log(JSON.stringify(e));
+						}
+					});
+				}
+			});
+			var mobile = '13425525011'; // 获取手机号
+			var nick_name = 'xm';  // 获取用户名(微信，qq,...)
+			var uuid = $('#uuid').val();
+			$(function(){
+				$('.log_phone_btn').on('click',function(){
+					console.log('注册')
+					$.ajax({
+						url:'https://192.168.1.55:448/user/registerOrLogin',
+						type:'post',
+						async:false,
+						data:{
+							'nick_name':nick_name,
+							'mobile':mobile,
+							'type':1    //1 手机登陆，2微信登陆
+						},
+						dataType:'json',
+						success:function(result){
+							console.log('发送成功');
+							var useId = result.data;
+							window.localStorage.setItem('useId',useId);
+							// window.localStorage.setItem('alreadyLogin',true);
+							setLocalStorage('alreadyLogin',true,"30");
+							console.log(useId);
+							window.location.href = 'index.html';
+						},
+						error:function(error){
+							console.log('发送失败')
+							var str = JSON.stringify(error);
+							console.log(str);
+							console.log(str);
+
+						}
+					});
+				});
+				
+				/* 勾选切换 */
+				$('.protocol_label').on('click',function(){
+					let protocolCheck = $(this).find('.protocol_check');
+					protocolCheck.toggleClass('protocol_active');
+					if(protocolCheck.hasClass('protocol_active')){
+						$('.log_btn').removeClass('log_embar_btn');
+					}else{
+						$('.log_btn').addClass('log_embar_btn');
+					}
+				});
+
+				/* 没有选择同意点击提示 */
+				$('.log_btn').on('click',function(){
+					if($(this).hasClass('log_embar_btn')){
+						alert('还没有同意用户协议和隐私政策!');
+						return false;
+					}
+				});
+				
+			})
+
+
+			// 注册接口调试
+			/* var phone = '1393939432';
+			 var uuid = $('#uuid').val();
+			$.ajax({
+				url:'https://192.168.1.67:448/shiZhiAn/register',
+				type:'post',
+				data:{'phone':phone,'uuid':uuid},
+				dataType:'json',
+				success:function(result){
+					var str = JSON.stringify(result);
+					 console.log(result)
+					  console.log(str);
+				},error(ero){
+					console.log(ero);
+				}
+			}) */
+
+		</script>
+
+	</body>
+</html>

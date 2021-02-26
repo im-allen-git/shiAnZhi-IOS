@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+		<link href="../index/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_fqwptv0pmzf.css" />
+		<link rel="stylesheet" href="css/com.css" />
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+		<!-- 日期选择插件 -->
+		<!-- <link rel="stylesheet" href="../mui/css/mui.min.css"> -->
+
+
+
+		<script src="../index/js/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+
+		<script src="../mui/js/mui.min.js"></script>
+		<style>
+			button {
+				display: block;
+				margin: 50px auto;
+			}
+
+			select {
+				width: 100%;
+				height: 30px;
+				line-height: 30px;
+				margin-top: 20px;
+			}
+			
+			ul li{list-style: none;line-height: 28px;border-bottom:1px solid #666;}
+			input{border:1px solid #333;border-radius: 4px;width:80%;}
+			div{margin-top:20px;}
+		</style>
+	</head>
+	<body>
+		<div class="wifi_wrap">
+			<button class="btn btn-success" id="test_button">点我测试</button>
+			<!-- <div>
+			<ul name="" id="wifiList" class="mui-table-view"> </ul>
+		</div> -->
+			<div>
+				<select name="" id="wifiList" class="mui-table-view"></select>
+
+			</div>
+			<div>
+				<input type="text" id="password" value="" />
+			</div>
+			<div>
+				<button class="btn btn-success wifi_sure" id="wifi_sure">验证wifi4</button>
+			</div>
+		</div>
+		<script>
+			var ssid = '';
+			var password = '';
+
+			(function($, doc) {
+				$.init({
+					//通知栏的颜色
+					statusBarBackground: '#f7f7f7'
+				});
+				$.plusReady(function() {
+
+
+					document.getElementById("test_button").addEventListener("tap", function() {
+						// $('#test_button').click(function(){
+
+						judgePlatform();
+
+						function judgePlatform() {
+							switch (plus.os.name) {
+								case "Android":
+									// Android平台: plus.android.*
+									console.log('进入安卓');
+									androidOpenWifi(); //通常需要3~5秒
+									loadWifiInfo();
+									break;
+								case "iOS":
+									// iOS平台: plus.ios.*
+									break;
+								default:
+									// 其它平台
+									break;
+							}
+						}
+
+					});
+					//监听每一个ul下的li事件
+					//  mui(".mui-table-view").on('tap', '.mui-table-view-cell', function() {
+
+					mui(".wifi_wrap").on('tap', '.wifi_sure', function() {
+
+
+						var obj = document.getElementById("wifiList"); //定位id
+
+						var index = obj.selectedIndex; // 选中索引
+
+						var ssid = obj.options[index].text; // 选中文本     输出张三等汉字信息
+
+						// var ssid = obj.options[index].value; // 选中值        输出zhangsan等英文信息	  
+
+
+
+						password = document.getElementById('password').value;
+
+						console.log('点击选择的时候获取到的SSID==' + ssid);
+						console.log('点击选择的时候获取到的password==' + password);
+						judgePlatform();
+
+						function judgePlatform() {
+							switch (plus.os.name) {
+								case "Android":
+									// Android平台: plus.android.*
+									// androidWifiConnection("FGJSB", "fuguangjsb14", "wpa"); 
+									// androidWifiConnection("HWIFI", "1234", "wpa"); // 密码错误， enableNetwork status enable== true
+									//  androidWifiConnection("HWIFI", "ldl@12345678", "wpa");  // OK  enableNetwork status enable== true
+									//  androidWifiConnection(ssid, password,"wpa");
+									// alert(1);
+									// androidWifiConnection(ssid, password, "web");
+
+									ConnectWifi(ssid, password, '1', '');
+									break;
+								case "iOS":
+									// iOS平台: plus.ios.*
+									break;
+								default:
+									// 其它平台
+									break;
+							}
+						}
+					});
+				});
+			}(mui, document));
+
+			/**
+			 * 获取安卓的wifi列表
+			 */
+			function loadWifiInfo() {
+				// 主窗体
+				var MainActivity = plus.android.runtimeMainActivity()
+				// 上下文
+				var Context = plus.android.importClass('android.content.Context')
+				// 导入WIFI管理 和 WIFI 信息 的class
+				plus.android.importClass("android.net.wifi.WifiManager")
+				plus.android.importClass("android.net.wifi.WifiInfo")
+				plus.android.importClass("android.net.wifi.ScanResult")
+				plus.android.importClass("java.util.ArrayList")
+				// 获取 WIFI 管理实例
+				var wifiManager = MainActivity.getSystemService(Context.WIFI_SERVICE)
+
+				// 获取当前连接WIFI的信息
+				var info = wifiManager.getConnectionInfo();
+				console.log("进入获取wifi列表, 当前连接的wifi的信息是:" + info);
+				// 获取当前 WIFI 连接的 SSID (WIFI 名称)
+				//var ssid = info.getSSID()
+				// 这里的 获取到的名称 是 带 双引号的 如 "cmcc"  
+				// 所以我们这里处理一下
+				//ssid = ssid.replace(/(^\"*)|(\"*$)/g, "")
+				// var resultList = wifiManager.getScanResults();
+				// console.log('resultList ==' + resultList);
+				// var list = "";
+				// var ul = document.getElementById("wifiList");
+				// for (var i = 0; i < resultList.size(); i++) {
+				// 	var sSID = resultList.get(i).plusGetAttribute('SSID')
+				// 	if (sSID != "") {
+				// 		list += '<li class="mui-table-view-cell"><p>' + sSID + '</p></li>';
+				// 	}
+				// }
+				// // console.log('ul==' + ul);
+				// // console.log('list==' + list);
+				// ul.innerHTML = list;
+
+
+				getWifiName();
+
+
+			}
+
+
+			/**
+			 * 打开安卓的wifi模块
+			 */
+			function androidOpenWifi() {
+				var bRet = false;
+				var MainActivity = plus.android.runtimeMainActivity()
+				var Context = plus.android.importClass('android.content.Context')
+				plus.android.importClass("android.net.wifi.WifiManager")
+				plus.android.importClass("android.net.wifi.WifiInfo")
+				var wifiManager = MainActivity.getSystemService(Context.WIFI_SERVICE)
+				if (!wifiManager.isWifiEnabled()) {
+					bRet = wifiManager.setWifiEnabled(true); //返回自动打开的结果
+					console.log("打开wifi的返回结果是==" + bRet);
+				} else {
+					bRet = true;
+					console.log("wifi原本已经打开")
+				}
+				return bRet;
+			}
+
+
+			/**
+			 * 安卓自动连接wifi，根据制定的ssid
+			 * @param {Object} ssid 名称
+			 * @param {Object} password 密码
+			 * @param {Object} type 加密方式
+			 */
+			function androidWifiConnection(ssid, password, type) {
+				console.log('开始进入自动连接');
+				var MainActivity = plus.android.runtimeMainActivity();
+				var Context = plus.android.importClass('android.content.Context');
+				plus.android.importClass("android.net.wifi.WifiManager");
+				plus.android.importClass("android.net.wifi.WifiInfo");
+				plus.android.importClass("android.net.wifi.WifiConfiguration");
+				var wifiManager = MainActivity.getSystemService(Context.WIFI_SERVICE);
+
+				//WifiConfiguration
+				var wifiConfig = androidCreateWifiInfo(ssid, password, type);
+				//
+				console.log('新加的 wifiConfig== ' + wifiConfig);
+
+				if (wifiConfig == null) {
+					console.log("wifiConfig is null!")
+					return;
+				}
+
+				//WifiConfiguration
+				var WifiConfiguration = tempConfig = isExsitsAndroid(ssid);
+
+				if (tempConfig != null) {
+					console.log("删除原来连接的wifi == " + tempConfig);
+					wifiManager.removeNetwork(tempConfig.plusGetAttribute('networkId'));
+				}
+				//int
+				console.log("要连接的新的wifi配置：" + wifiConfig)
+
+				var netID = wifiManager.addNetwork(wifiConfig);
+				console.log('netID == ' + netID);
+
+				//boolean
+				var enabled = wifiManager.enableNetwork(netID, true);
+				console.log("enableNetwork status enable==" + enabled)
+				// boolean
+				var connected = wifiManager.reconnect();
+				console.log('wifiManager ==' + wifiManager);
+				console.log("enableNetwork connected==" + connected);
+
+				if (enabled == true && connected == true) {
+					alert('密码匹配');
+					// 开始发送 wifi 数据到蓝牙
+
+				} else {
+					alert('您输入的密码不正确，请重新输入');
+				}
+
+			}
+
+			/**
+			 * 查看以前是否也配置过这个网络
+			 */
+			function isExsitsAndroid(sSID) {
+
+				//WifiConfiguration
+				var MainActivity = plus.android.runtimeMainActivity();
+				var Context = plus.android.importClass('android.content.Context');
+				plus.android.importClass("android.net.wifi.WifiManager");
+				plus.android.importClass("android.net.wifi.WifiInfo");
+				var List = plus.android.importClass("java.util.List");
+				var ArrayList = plus.android.importClass("java.util.ArrayList");
+				var wifiManager = MainActivity.getSystemService(Context.WIFI_SERVICE);
+				//
+				var existingConfigs = new ArrayList();
+				existingConfigs = wifiManager.getConfiguredNetworks();
+				if (existingConfigs.size() != 0) {
+					for (var i = 0; i < existingConfigs.size(); i++) {
+						if (existingConfigs.get(i).plusGetAttribute('SSID') == ("\"" + sSID + "\"")) {
+							console.log("该制定的ssid存在于配置中:" + sSID);
+							return existingConfigs.get(i);
+						}
+					}
+				}
+				console.log("该ssid没有配置过")
+				return null;
+			}
+
+			/**
+			 * 创建wifi配置对象
+			 * @param {Object} SSID
+			 * @param {Object} Password
+			 * @param {Object} Type
+			 */
+			function androidCreateWifiInfo(SSID, Password, Type) {
+				plus.android.importClass("java.util.BitSet");
+				var WifiConfiguration = plus.android.importClass("android.net.wifi.WifiConfiguration");
+				var config = new WifiConfiguration();
+				config.plusGetAttribute('allowedAuthAlgorithms').clear();
+				config.plusGetAttribute('allowedGroupCiphers').clear();
+				config.plusGetAttribute('allowedKeyManagement').clear();
+				config.plusGetAttribute('allowedPairwiseCiphers').clear();
+				config.plusGetAttribute('allowedProtocols').clear();
+				config.plusSetAttribute('SSID', "\"" + SSID + "\"");
+				// nopass
+				if (Type == "nopass") {
+					config.plusSetAttribute(wepKeys[0], "");
+					config.plusGetAttribute('allowedKeyManagement').set(WifiConfiguration.KeyMgmt.NONE);
+					config.plusSetAttribute('wepTxKeyIndex', 0);
+				}
+
+
+
+				// wep
+				if (Type == "wep") {
+					if (!Password != "") {
+						if (isHexWepKey(Password)) {
+							config.plusSetAttribute(wepKeys[0], Password);
+						} else {
+							config.plusSetAttribute(wepKeys[0], "\"" + Password + "\"");
+						}
+					}
+					config.allowedAuthAlgorithms.set(AuthAlgorithm.OPEN);
+					config.allowedAuthAlgorithms.set(AuthAlgorithm.SHARED);
+					config.allowedKeyManagement.set(KeyMgmt.NONE);
+					config.plusSetAttribute('wepTxKeyIndex', 0);
+				}
+				// wpa
+				if (Type == "wpa") {
+					config.plusSetAttribute('preSharedKey', "\"" + Password + "\"");
+					config.plusSetAttribute('hiddenSSID', true);
+
+					config.plusGetAttribute('allowedAuthAlgorithms').set(WifiConfiguration.AuthAlgorithm.OPEN);
+					config.plusGetAttribute('allowedGroupCiphers').set(WifiConfiguration.GroupCipher.TKIP);
+					config.plusGetAttribute('allowedKeyManagement').set(WifiConfiguration.KeyMgmt.WPA_PSK);
+					config.plusGetAttribute('allowedPairwiseCiphers').set(WifiConfiguration.PairwiseCipher.TKIP);
+					// 此处需要修改否则不能自动重联
+					//config.plusGetAttribute('allowedProtocols').set(WifiConfiguration.Protocol.WPA);
+					config.plusGetAttribute('allowedGroupCiphers').set(WifiConfiguration.GroupCipher.CCMP);
+					config.plusGetAttribute('allowedPairwiseCiphers').set(WifiConfiguration.PairwiseCipher.CCMP);
+					config.plusSetAttribute('status', WifiConfiguration.Status.ENABLED);
+				}
+				return config;
+
+
+
+			}
+
+			//-------------------------ios代码
+
+
+
+
+
+			//获取当前wifi
+			getWifiName = function() {
+				if (mui.os.android) {
+					// console.log('开始获取wifi列表');
+					var wifiManager, wifiInfo;
+					var Context = plus.android.importClass("android.content.Context");
+					var WifiManager = plus.android.importClass("android.net.wifi.WifiManager");
+					var WifiInfo = plus.android.importClass("android.net.wifi.WifiInfo");
+					wifiManager = plus.android.runtimeMainActivity().getSystemService(Context.WIFI_SERVICE);
+					wifiInfo = wifiManager.getConnectionInfo(); // 获取连接的wifi 名
+					wifis = wifiManager.getScanResults();
+					var str = wifis.toString();
+					var s = str.substring(0, str.length);
+					var arr = s.split(',');
+					var name_arr = [];
+					for (var i = 0; i < arr.length; i++) {
+						// console.log(arr[i]);
+						if (arr[i].indexOf('SSID:') > 0) {
+							name_arr.push(arr[i]);
+						}
+					}
+
+					// console.log('新数组name_arr == ' + name_arr);
+
+					var newNameArr = [];
+					for (var j = 0; j < name_arr.length; j++) {
+						var a = name_arr[j];
+						var b = name_arr[j].indexOf('BSSID');
+						if (name_arr[j].indexOf('BSSID') == -1) {
+							newNameArr.push(name_arr[j]);
+						}
+					}
+
+					// console.log('最终新数组newNameArr == ' + newNameArr);
+
+					var option = '';
+					for (var k = 0; k < newNameArr.length; k++) {
+						// console.log(newNameArr[k].substring(6,newNameArr[k].length));
+						// li+= '<li class="mui-table-view-cell"><p class="p1">'+ newNameArr[k].substring(6,newNameArr[k].length) +'</p><input type="text" class="input_val" /></li>';
+						option += '<option class="mui-table-view-cell">' + newNameArr[k].substring(6, newNameArr[k].length) +
+							'</option>';
+					};
+					console.log(option);
+					// console.log(li);
+					$('#wifiList').html(option);
+					// ssid = $('#wifiList option:selected').text();
+					// password = $('#password').val();
+					// console.log('ssid==' + ssid);
+					// console.log('password==' + password);
+				}
+			};
+		</script>
+
+	</body>
+</html>

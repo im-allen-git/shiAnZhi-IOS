@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>report</title>
+		<link href="../../index/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_fqwptv0pmzf.css" />
+		<link rel="stylesheet" href="../css/com.css">
+		<!-- 日期选择插件 -->
+		<link rel="stylesheet" href="../../mui/css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="../../mui/css/app.css" />
+		<link rel="stylesheet" type="text/css" href="../../mui/css/mui.picker.min.css" />
+
+
+		<style>
+			body{background-color:#f5f5f5;}
+			.qa{height: 100%;width:100%;background-color:#fff;position: fixed;}
+			textarea{margin:20px 0 ;}
+
+		</style>
+	</head>
+	<body>
+		<!-- <div class="top_wrap"></div> -->
+		<div class="qa">
+			<div class="tc_wrap"></div>
+			<div class="container bgfff pb60">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="top mt80">
+							<a href="../my.html" class="add_back" >
+								<i class="iconfont icon-left c0"></i>
+							<span> 问题与建议 -- QA  </span>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<textarea name="" id="qaText" cols="30" rows="10" class="form-control"></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6"><button class="btn -btn-default">取消</button></div>
+					<div class="col-xs-6 text-right"><button class="btn btn-success" id="qa" onclick="qa()">提交</button></div>
+				</div>
+			</div>
+
+		</div>
+
+	</body>
+</html>
+<script src="../../index/js/jquery.min.js"></script>
+<script src="../js/com.js"></script>
+<script>
+	// 问题与建议接口
+	var userId = window.localStorage.getItem("useId");
+	function qa(){
+		console.log('提交qa');
+		var qaText = $('#qaText').val();
+
+		$.ajax({
+			url:'https://192.168.1.55:448/user/qaAdd',
+			type:'post',
+			data:{
+				'user_id':userId,
+				'content':qaText
+			},
+			success:function(OK){
+				console.log('发送QA成功');
+				// alert('发送成功时候的数据2 ==' + qaText) ;
+				// window.open('../my.html');
+				window.location.href = "../my.html"
+			},
+			error:function(ero){
+				alert('发送QA失败 == ' + ero);
+			}
+		})
+	}
+</script>

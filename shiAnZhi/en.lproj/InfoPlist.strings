@@ -1,0 +1,9 @@
+/* Localized versions of Info.plist keys */
+CFBundleDisplayName="Shi An Zhi";
+NSLocationAlwaysAndWhenInUseUsageDescription = "Keep Bluetooth connected";
+NSBluetoothPeripheralUsageDescription = "App needs your permission to access Bluetooth";
+NSBluetoothAlwaysUsageDescription = "App needs your permission to access Bluetooth";
+NSLocalNetworkUsageDescription = "App needs your permission to access the local network";
+NSCameraUsageDescription = "App needs your permission to access the camera";
+NSLocationWhenInUseUsageDescription = "Keep Bluetooth connected";
+NSLocationAlwaysUsageDescription = "Keep Bluetooth connected";

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+		<link href="../index/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://at.alicdn.com/t/font_1881137_fqwptv0pmzf.css" />
+		<link rel="stylesheet" href="css/com.css" />
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+		<style>
+			.container{margin-top:50px;}
+		</style>
+	</head>
+	<body>
+
+		<div class="container">
+			<div class="row">
+				<div class="col-xs-12">
+					<input type="text" class="form-control">
+				</div>
+			</div>
+		</div>
+
+
+	</body>
+</html>
+<script src="../index/js/jquery.min.js"></script>
+		<!-- <script type="text/javascript" src="../js/common.js"></script> -->
+
+<script src="../mui/js/mui.min.js"></script>
+<script>
+	document.addEventListener('plusready', function(e){
+		getDeviceInfo();
+		// 获取设备信息
+		function getDeviceInfo(){
+			plus.device.getInfo({
+				success:function(e){
+					console.log('getDeviceInfo success: '+e); // 返回的是obj
+					console.log('getDeviceInfo success: '+JSON.stringify(e));
+					var uuid = e.uuid;
+					console.log(uuid);
+					console.log(uuid);
+					$('input').val(uuid);
+				},
+				fail:function(e){
+					console.log('getDeviceInfo failed: '+JSON.stringify(e));
+					console.log(JSON.stringify(e));
+				}
+			});
+		}
+	});
+
+
+</script>

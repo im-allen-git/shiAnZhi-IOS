@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+		<title>称重列表</title>
+		<link rel="stylesheet" href="css/main.css">
+		<script type="text/javascript">
+			(function() {
+				var currClientWidth, fontValue, originWidth;
+				originWidth = 750;
+				__resize();
+				window.addEventListener('resize', __resize, false);
+		
+				function __resize() {
+					currClientWidth = document.documentElement.clientWidth || document.body.clientWidth;
+					if (currClientWidth > 768) {
+						currClientWidth = 768;
+					}
+					if (currClientWidth < 320) {
+						currClientWidth = 320;
+					}
+					fontValue = (currClientWidth / originWidth * 100).toFixed(2);
+					document.getElementsByTagName("html")[0].style.fontSize = fontValue + 'px';
+				}
+			})();
+		</script>
+		<style>
+			.top_wrap {
+			    width: 100%;
+			    height: 0.6rem;
+			    background-color: rgba(0,0,0,.2);
+			}
+			.list_back{    font-size: 0.5rem;
+    font-weight: 700;
+    float: left;
+    padding:0.2rem;}
+			.calculate_param{    width: 100%;
+			margin: 0 auto;
+			position: absolute;
+			left: 0;
+			top:1.6rem;
+			z-index: 100;
+			overflow: auto;
+			height:85%;}
+			.meal_list{width: 92%;
+    margin: 0 auto;}
+			.meal_list_item{    height: 0.6rem;
+    line-height: 0.65rem;text-align: left;border-bottom: 1px dashed #d0d0d0;}
+			.meal_list_item span{display: inline-block;font-size: 0.28rem;}
+			.meal_time{width: 40%;}
+			.meal_num{    min-width: 20%;}
+			.shi_unit{}
+		</style>
+	</head>
+	<body>
+		<!-- <div class="top_wrap"></div> -->
+		<div class="calculate_main">
+			<div class="back clearfix">
+				<i class="iconfont list_back" onClick="javascript:history.back(-1);">&#xe7ec;</i>
+			</div>
+
+			<div class="calculate_param"></div>
+		</div>
+
+		<script src="js/jquery.min.js"></script>
+		<script>
+			//cookie
+			// param name : 表示cookie的名称，必填
+			// param subName : 表示子cookie的名称，必填
+			// param value : 表示子cookie的值，必填
+			// param expires : 表示cookie的过期时间，可以不填
+			// param domain : 表示cookie的域名，可以不填
+			// param path : 表示cookie的路径，可以不填
+			// param secure : 表示cookie的安全标志，可以不填
+			var cookieObject= {
+			    setCookie: function(name, value, expiry, path, domain, secure) {
+			        var nameString = "ck_" + name + "=" + value;
+			        var expiryString = "";
+			        if(expiry != null) {
+			            try {
+			                expiryString = "; expires=" + expiry.toUTCString();
+			            }
+			            catch(e) {
+			                if(expiry) {
+			                    var lsd = new Date();
+			                    lsd.setTime(lsd.getTime() + expiry * 1000);
+			                    expiryString = "; expires=" + lsd.toUTCString();
+			                }
+			            }
+			        } else {
+			            var ltm = new Date();
+			            expiryString = "; expires=" + ltm.toUTCString();
+			        }
+			        var pathString = (path == null) ? " ;path=/" : " ;path = " + path;
+			        var domainString = (domain == null) ? "" : " ;domain = " + domain;
+			        var secureString = (secure) ? ";secure=" : "";
+			        document.cookie = nameString + expiryString + pathString + domainString + secureString;
+			    },
+			    getCookie: function(name) {
+			        var i, aname, value, ARRcookies = document.cookie.split(";");
+			        for(i = 0; i < ARRcookies.length; i++) {
+			            aname = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
+			            value = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
+			            aname = aname.replace(/^\s+|\s+$/g, "");
+			            if(aname == "ck_" + name) {
+			                return(value);
+			            }
+			        }
+			        return '';
+			    },
+			    removeCookie:function(name){
+			        this.setCookie(name,'',-1);
+			    }
+			};
+			var storageObject= {
+			    localGetItem: function(key) { //假如浏览器支持本地存储则从localStorage,localStorage，否则乖乖用Cookie
+			        return window.localStorage ? localStorage.getItem(key) : cookieObject.getCookie(key);
+			    },
+			    localSetItem: function(key, val) {
+			        return window.localStorage ? localStorage.setItem(key, val) : cookieObject.setCookie(key, val);
+			    },
+			    localRemoveItem:function(key){
+			        return window.localStorage ? localStorage.removeItem(key) : cookieObject.removeCookie(key);
+			    },
+			    sessionGetItem:function(key){
+			        return window.localStorage ? localStorage.getItem(key) : cookieObject.getCookie(key);
+			    },
+			    sessionSetItem:function(key, val){
+			        return window.localStorage ? localStorage.setItem(key, val) : cookieObject.setCookie(key, val);
+			    },
+			    sessionRemoveItem:function(key){
+			        return window.localStorage ? localStorage.removeItem(key) : cookieObject.removeCookie(key);
+			    }
+			};
+			var now = new Date();
+			var year = now.getFullYear();
+			var month = ((now.getMonth()+1)<10?"0":"")+(now.getMonth()+1);
+			var day = (now.getDate()<10?"0":"")+now.getDate();
+			var hour = (now.getHours()<10?"0":"")+now.getHours();
+			var minutes = (now.getMinutes()<10?"0":"")+now.getMinutes();
+			var item = '盐'; //食物大类别
+			var weightUnit = '克';
+			var weightUnit1 = 'g';
+			var deviceId = window.localStorage.getItem('deviceId');//mac
+			var userId = window.localStorage.getItem("useId"); //用户id
+			
+			let foodTypeVal = storageObject.localGetItem('foodTypeVal');
+			console.log(foodTypeVal)
+			if (foodTypeVal) {
+				var foodTypeArr = foodTypeVal.split("||");
+				var indexfoodTypeArr = 0;
+				var newfoodTypeArr;
+				for (var i in foodTypeArr) {
+					if (foodTypeArr[i].indexOf(deviceId) > -1 && foodTypeArr[i].indexOf(name) > -1) {
+						//盐@@0@@克@@esp-v13左@@C4:4F:33:75:91:DF@@5FAFC201-1FB5-459E-8FCC-C5C9C331914B@@5EB5483E-36E1-4688-B7F5-EA07361B26A8
+						
+						var a = foodTypeArr[i].split("@@");
+						item = a[0];
+						deviceId = a[4];
+						var newFootType = a[0] + "@@" + a[1] + "@@" + a[2] + "@@" + a[3] + "@@" + a[4] + "@@" + a[5] + "@@" + a[6]
+						newfoodTypeArr = foodTypeArr.splice(i, 1, newFootType);
+						indexfoodTypeArr = i;
+						break;
+					}
+				}
+				var newfoodTypeAll = '';
+				for (var j in foodTypeArr) {
+					if (j == foodTypeArr.length - 1) {
+						newfoodTypeAll += foodTypeArr[j]
+					} else {
+						newfoodTypeAll += foodTypeArr[j] + "||"
+					}
+				}
+				storageObject.localSetItem('foodTypeVal', newfoodTypeAll);
+			}
+			let startTime = year+'-'+month+'-17 00:00:00';
+			let endTime = year+'-'+month+'-17 23:59:00';
+			
+			let str1 = [{"flag_type":0,"format_time":"2020-11-17 18:02","id":4402,"number":4,"type":"2","waste_rate":"24","weight":"150"},{"flag_type":0,"format_time":"2020-11-17 18:07","id":4403,"number":4,"type":"2","waste_rate":"24","weight":"120"},{"flag_type":0,"format_time":"2020-11-17 18:08","id":4404,"number":4,"type":"2","waste_rate":"24","weight":"59"},{"flag_type":0,"format_time":"2020-11-17 18:08","id":4405,"number":4,"type":"2","waste_rate":"24","weight":"120"},{"flag_type":0,"format_time":"2020-11-17 18:23","id":4406,"number":4,"type":"2","waste_rate":"24","weight":"170"},{"flag_type":0,"format_time":"2020-11-17 18:24","id":4407,"number":4,"type":"2","waste_rate":"24","weight":"120"},{"flag_type":0,"format_time":"2020-11-17 18:24","id":4408,"number":4,"type":"2","waste_rate":"24","weight":"170"},{"flag_type":0,"format_time":"2020-11-17 18:24","id":4409,"number":4,"type":"2","waste_rate":"24","weight":"256"},{"flag_type":0,"format_time":"2020-11-17 18:25","id":4410,"number":4,"type":"2","waste_rate":"24","weight":"170"},{"flag_type":0,"format_time":"2020-11-17 18:30","id":4411,"number":4,"type":"2","waste_rate":"24","weight":"170"},{"flag_type":0,"format_time":"2020-11-17 18:31","id":4412,"number":4,"type":"2","waste_rate":"24","weight":"170"}];
+			console.log('详情返回的所有重量数据是：'+JSON.stringify(str1));
+
+			let calculateListHtml = '<ul class="meal_list">';
+			for(let i=0;i<str1.length;i++){
+				calculateListHtml += '<li class="meal_list_item clearfix"><span class="meal_time">'+str1[i].format_time+'</span>';
+				calculateListHtml += '<span class="meal_num">'+str1[i].weight+'</span><span class="shi_unit">'+weightUnit+'</span>';
+				calculateListHtml += '</li>';
+				
+			}
+			calculateListHtml += '</ul>';
+			$('.calculate_param').append(calculateListHtml);
+
+			// $.ajax({
+			// 	url:'https://192.168.1.55:448/user/getWeightingDataCalculateList',
+			// 	type:'post',
+			// 	data:{
+			// 		'user_id':userId,
+			// 		'item':item,
+			// 		'mac':deviceId,
+			// 		'start_time':startTime,
+			// 		'end_time':endTime
+			// 	},
+			// 	dataType:'json',
+			// 	success:function(result7){
+					
+			// 		/* 获取到后台大类别数据后操作方法 */
+			// 		// alert('返回的重量数据是：'+result7)
+			// 		console.log('详情返回的所有重量数据是：'+JSON.stringify(result7));
+					
+			// 	},
+			// 	error:function(err){
+			// 		console.log(err);
+			// 	}
+			// });
+		</script>
+	</body>
+</html>

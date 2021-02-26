@@ -1,0 +1,9 @@
+/* Localized versions of Info.plist keys */
+CFBundleDisplayName="食安知";
+NSLocationAlwaysAndWhenInUseUsageDescription = "保持连接蓝牙设备";
+NSBluetoothPeripheralUsageDescription = "App需要您的同意,才能访问蓝牙";
+NSBluetoothAlwaysUsageDescription = "App需要您的同意,才能访问蓝牙";
+NSLocalNetworkUsageDescription = "App需要您的同意,才能访问本地网络";
+NSCameraUsageDescription = "App需要您的同意,才能访问摄像头";
+NSLocationWhenInUseUsageDescription = "保持连接蓝牙设备";
+NSLocationAlwaysUsageDescription = "持续保持连接蓝牙设备";
